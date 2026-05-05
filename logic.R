@@ -57,30 +57,21 @@ today_in_dr <- function() {
 #'
 #' @export
 fetch_cevaldom_prices <- function(date = NULL) {
-  req <- request("https://www.cevaldom.com/api/cevaldom/fetch-prices")
+  page <- read_html_live("https://www.cevaldom.com/mercado/otc/")
 
-  if (Sys.getenv("ENV") == "BCRD") {
-
-    req <- req |>
-      req_proxy(
-        url = Sys.getenv("PROXY"),
-        username = Sys.getenv("USER"),
-        password = Sys.getenv("PASS")
-      )
-  }
-
-  if (!is.null(date)) {
-    req <- req |>
-      req_url_query(
-        fixedDate = format(as.Date(date), "%Y-%m-%d")
-      )
-  }
-
-  req |>
-    req_perform() |>
-    resp_body_json() |>
-    rbindlist(fill = TRUE) |>
-    as_tibble()
+  res <- page$session$Runtime$evaluate(
+    "
+  (async () => {
+    const r = await fetch('/api/cevaldom/fetch-prices');
+    const j = await r.json();
+    return JSON.stringify(j);
+  })();
+  ",
+    awaitPromise = TRUE
+  )
+  
+  data <- fromJSON(res$result$value) |>
+    tibble::as_tibble()
 }
 
 #' Ejecutar workflow de descarga y persistencia de precios de CEVALDOM
