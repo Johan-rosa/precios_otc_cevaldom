@@ -22,6 +22,22 @@ jobs:
       - name: Install renv and restore
         run: |
           Rscript -e "install.packages('renv'); renv::restore()"
+          
+      - name: Setup Chrome and ChromeDriver
+        run: |
+          # Update the apt key handling (newer approach)
+          sudo apt-get update
+          sudo apt-get install -y wget
+          
+          # Install Chrome using a more reliable method
+          wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
+          
+          # Verify Chrome installation
+          google-chrome --version
+          
+          # Install ChromeDriver using webdriver package in R
+          Rscript -e 'wdman::chrome()'
 
       - name: Run workflow
         run: |
