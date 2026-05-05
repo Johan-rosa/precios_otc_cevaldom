@@ -57,7 +57,7 @@ today_in_dr <- function() {
 #'
 #' @export
 fetch_cevaldom_prices <- function(date = NULL) {
-  page <- read_html_live("https://www.cevaldom.com/mercado/otc/")
+  page <- rvest::read_html_live("https://www.cevaldom.com/mercado/otc/")
 
   res <- page$session$Runtime$evaluate(
     "
@@ -70,7 +70,7 @@ fetch_cevaldom_prices <- function(date = NULL) {
     awaitPromise = TRUE
   )
   
-  data <- fromJSON(res$result$value) |>
+  data <- jsonlite::fromJSON(res$result$value) |>
     tibble::as_tibble()
 }
 
