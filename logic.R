@@ -67,7 +67,8 @@ fetch_cevaldom_prices <- function(date = NULL) {
     return JSON.stringify(j);
   })();
   ",
-    awaitPromise = TRUE
+    awaitPromise = TRUE,
+    timeout = 15000
   )
   
   data <- jsonlite::fromJSON(res$result$value) |>
